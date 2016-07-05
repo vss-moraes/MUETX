@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.JMenuBar;
@@ -35,6 +36,7 @@ import java.io.FileWriter;
 import java.util.Scanner;
 import java.awt.event.InputEvent;
 import javax.swing.SwingConstants;
+import javax.swing.JRadioButton;
 
 public class Principal {
 
@@ -50,14 +52,14 @@ public class Principal {
 	private static String nomeArquivo;
 	private static boolean textoSalvo;
 	
-	private final ImageIcon iconeNovo = new ImageIcon("icons/new.png");
-	private final ImageIcon iconeAbrir= new ImageIcon("icons/open.png");
-	private final ImageIcon iconeSalvar = new ImageIcon("icons/save.png");
-	private final ImageIcon iconeSalvarComo = new ImageIcon("icons/save-as.png");
+	private ImageIcon iconeNovo = new ImageIcon("icons/new.png");
+	private ImageIcon iconeAbrir= new ImageIcon("icons/open.png");
+	private ImageIcon iconeSalvar = new ImageIcon("icons/save.png");
+	private ImageIcon iconeSalvarComo = new ImageIcon("icons/save-as.png");
 	
-	private final ImageIcon iconeRecortar = new ImageIcon("icons/cut.png");
-	private final ImageIcon iconeCopiar = new ImageIcon("icons/copy.png");
-	private final ImageIcon iconeColar = new ImageIcon("icons/paste.png");
+	private ImageIcon iconeRecortar = new ImageIcon("icons/cut.png");
+	private ImageIcon iconeCopiar = new ImageIcon("icons/copy.png");
+	private ImageIcon iconeColar = new ImageIcon("icons/paste.png");
 	/**
 	 * Launch the application.
 	 */
@@ -258,8 +260,45 @@ public class Principal {
 		});
 		menuExibir.add(chkboxExibirBarraStatus);
 		
-		JMenu menuSobre = new JMenu("Sobre");
-		barraMenu.add(menuSobre);
+		JMenu menuEstilo = new JMenu("Estilo");
+		menuExibir.add(menuEstilo);
+		
+		JRadioButton radioButtonCobalto = new JRadioButton("Cobalto");
+		menuEstilo.add(radioButtonCobalto);
+		
+		JRadioButton radioButtonEscuro = new JRadioButton("Escuro");
+		menuEstilo.add(radioButtonEscuro);
+		
+		JRadioButton radioButtonPadrao = new JRadioButton("Padrão");
+		menuEstilo.add(radioButtonPadrao);
+		
+		radioButtonCobalto.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				trocaEstilo(new Color(0, 71, 150), new Color(200, 200, 200));
+				radioButtonEscuro.setSelected(false);
+				radioButtonPadrao.setSelected(false);
+			}
+		});
+		
+		radioButtonEscuro.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				trocaEstilo(new Color(50, 50, 50), new Color(200, 200, 200));
+				radioButtonCobalto.setSelected(false);
+				radioButtonPadrao.setSelected(false);
+			}
+		});
+		
+		radioButtonPadrao.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				trocaEstilo(new Color(255, 255, 255), new Color(0, 0, 0));
+				radioButtonCobalto.setSelected(false);
+				radioButtonEscuro.setSelected(false);
+			}
+		});
 		
 		barraFerramentas = new JToolBar();
 		barraFerramentas.setFloatable(false);
@@ -334,9 +373,13 @@ public class Principal {
 		barraStatus.setVisible(false);
 		janela.getContentPane().add(barraStatus, BorderLayout.SOUTH);
 		
-		atualizaStatus(1, 1);
+		atualizaStatus(1, 0);
 		barraStatus.add(textoBarraStatus);
-		
+	}
+	
+	public void trocaEstilo(Color fundo, Color fonte){
+		areaTexto.setBackground(fundo);
+		areaTexto.setForeground(fonte);
 	}
 	
 	public void atualizaStatus (int numeroLinha, int numeroColuna){

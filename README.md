@@ -10,10 +10,9 @@ Editor de texto simples criado para avaliação na disciplina Linguagens de Prog
 * Número de linhas
 * Barra de ferramentas básica
 * Barra de status com posição atual do cursor
+* Esquema de cores simples
 
 ### Funções a Serem Implementadas
 
 * Destaque de sintaxe
 * Opções de tamanho e tipo da fonte
-* Esquemas de cores
-
