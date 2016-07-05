@@ -42,14 +42,15 @@ public class Principal {
 	private JTextField textoBarraStatus;
 	private TextAreaNumeroLinhas numeroLinhas;
 	
-	private File arquivo;
+	private static File arquivo;
 	private static String texto;
 	private static String nomeArquivo;
-	private boolean textoSalvo;
+	private static boolean textoSalvo;
 	
 	private final ImageIcon iconeNovo = new ImageIcon("icons/new.png");
 	private final ImageIcon iconeAbrir= new ImageIcon("icons/open.png");
 	private final ImageIcon iconeSalvar = new ImageIcon("icons/save.png");
+	private final ImageIcon iconeSalvarComo = new ImageIcon("icons/save-as.png");
 	
 	private final ImageIcon iconeRecortar = new ImageIcon("icons/cut.png");
 	private final ImageIcon iconeCopiar = new ImageIcon("icons/copy.png");
@@ -111,8 +112,8 @@ public class Principal {
 			@Override
 			public void removeUpdate(DocumentEvent e){
 				numeroLinhas.atualizaNumeroLinhas();
-				if (nomeArquivo.charAt(nomeArquivo.length() -1) != '*' && !textoSalvo){
-					nomeArquivo = nomeArquivo + "*";
+				if (nomeArquivo.charAt(0) != '*' && !textoSalvo){
+					nomeArquivo = "*" + nomeArquivo;
 					janela.setTitle(nomeArquivo + " - MUETX (Mais Um Editor de TeXto)");
 				}
 				textoSalvo = false;
@@ -121,8 +122,8 @@ public class Principal {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 				numeroLinhas.atualizaNumeroLinhas();
-				if (nomeArquivo.charAt(nomeArquivo.length() -1) != '*' && !textoSalvo){
-					nomeArquivo = nomeArquivo + "*";
+				if (nomeArquivo.charAt(0) != '*' && !textoSalvo){
+					nomeArquivo = "*" + nomeArquivo;
 					janela.setTitle(nomeArquivo + " - MUETX (Mais Um Editor de TeXto)");
 				}
 				textoSalvo = false;
@@ -143,24 +144,22 @@ public class Principal {
 		
 		JMenuItem menuItemNovo = new JMenuItem("Novo");
 		menuItemNovo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
+		menuItemNovo.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				novoArquivo(janela);
+			}
+		});
 		menuArquivo.add(menuItemNovo);
 		
 		JMenuItem menuItemAbrir = new JMenuItem("Abrir...");
 		menuItemAbrir.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
 		menuItemAbrir.addActionListener(new ActionListener() {
+			
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (verificaMudanca(arquivo, janela, textoSalvo)){
-					JFileChooser janelaArquivo = new JFileChooser();
-					int opcao = janelaArquivo.showOpenDialog(janela);
-					if (opcao == JFileChooser.APPROVE_OPTION){
-						arquivo = janelaArquivo.getSelectedFile();
-						if (arquivo != null){
-							nomeArquivo = arquivo.getName();
-							janela.setTitle(nomeArquivo + " - MUETX (Mais Um Editor de TeXto)");
-							textoSalvo = abreArquivo(arquivo);
-						}
-					}
-				};
+				abrir(janela);
 			}
 		});
 		menuArquivo.add(menuItemAbrir);
@@ -170,18 +169,7 @@ public class Principal {
 		menuItemSalvar.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (arquivo == null){
-					JFileChooser janelaArquivo = new JFileChooser();
-					janelaArquivo.showSaveDialog(janela);
-					arquivo = janelaArquivo.getSelectedFile();
-				}
-				if (arquivo != null){
-					texto = areaTexto.getText();
-					textoSalvo = salvaArquivo(arquivo, texto);
-					nomeArquivo = arquivo.getName();
-					janela.setTitle(nomeArquivo + " - MUETX (Mais Um Editor de TeXto)");
-				}
-				
+				salvar(janela);
 			}
 		});
 		menuArquivo.add(menuItemSalvar);
@@ -191,15 +179,7 @@ public class Principal {
 		menuItemSalvarComo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser janelaArquivo = new JFileChooser();
-				janelaArquivo.showSaveDialog(janela);
-				arquivo = janelaArquivo.getSelectedFile();
-				if (arquivo != null){
-					texto = areaTexto.getText();
-					textoSalvo = salvaArquivo(arquivo, texto);
-					nomeArquivo = arquivo.getName();
-					janela.setTitle(nomeArquivo + " - MUETX (Mais Um Editor de TeXto)");
-				}
+				salvarComo(janela);
 			}
 		});
 		menuArquivo.add(menuItemSalvarComo);
@@ -256,19 +236,9 @@ public class Principal {
 		});
 		menuExibir.add(chkboxExibirBarraStatus);
 		
-/*		JCheckBoxMenuItem chkboxExibirNumeroLinhas = new JCheckBoxMenuItem();
-		chkboxExibirNumeroLinhas.setText("Número de Linhas");
-		chkboxExibirNumeroLinhas.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {				
-				numeroLinhas.setVisible(chkboxExibirNumeroLinhas.getState());
-			}
-		});
-		menuExibir.add(chkboxExibirNumeroLinhas);
-		
 		JMenu menuSobre = new JMenu("Sobre");
 		barraMenu.add(menuSobre);
-*/		
+		
 		barraFerramentas = new JToolBar();
 		barraFerramentas.setFloatable(false);
 		barraFerramentas.setVisible(false);
@@ -276,15 +246,44 @@ public class Principal {
 		
 		JButton btnNovo = new JButton(iconeNovo);
 		btnNovo.setToolTipText("Cria um arquivo em branco.");
+		btnNovo.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				novoArquivo(janela);
+			}
+		});
 		barraFerramentas.add(btnNovo);
 		
 		JButton btnAbrir = new JButton(iconeAbrir);
 		btnAbrir.setToolTipText("Abre um arquivo.");
+		btnAbrir.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				abrir(janela);
+			}
+		});
 		barraFerramentas.add(btnAbrir);
 		
 		JButton btnSalvar = new JButton(iconeSalvar);
 		btnSalvar.setToolTipText("Salva o arquivo atual.");
+		btnSalvar.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				salvar(janela);
+			}
+		});
 		barraFerramentas.add(btnSalvar);
+		
+		JButton btnSalvarComo = new JButton(iconeSalvarComo);
+		btnSalvarComo.setToolTipText("Salva o arquivo atual em outro arquivo.");
+		btnSalvarComo.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				salvarComo(janela);
+			}
+		});
+		barraFerramentas.add(btnSalvarComo);
 		
 		barraFerramentas.addSeparator(new Dimension(20, 0));
 		
@@ -337,6 +336,16 @@ public class Principal {
 		return true;
 	}
 	
+	public static void novoArquivo (JFrame janela){
+		if (verificaMudanca(arquivo, janela, textoSalvo)){
+			arquivo = null;
+			areaTexto.setText("");
+			textoSalvo = true;
+			nomeArquivo = "Sem título";
+			janela.setTitle(nomeArquivo + " - MUETX (Mais Um Editor de TeXto)");
+		}
+	}
+	
 	public static boolean abreArquivo(File arquivo){
 		try {
 			Scanner leitor = new Scanner(arquivo);
@@ -344,6 +353,7 @@ public class Principal {
 			
 			while (leitor.hasNextLine()){
 				texto += leitor.nextLine() + "\n";
+
 			}
 			leitor.close();
 			
@@ -355,6 +365,21 @@ public class Principal {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	public static void abrir(JFrame janela){
+		if (verificaMudanca(arquivo, janela, textoSalvo)){
+			JFileChooser janelaArquivo = new JFileChooser();
+			int opcao = janelaArquivo.showOpenDialog(janela);
+			if (opcao == JFileChooser.APPROVE_OPTION){
+				arquivo = janelaArquivo.getSelectedFile();
+				if (arquivo != null){
+					nomeArquivo = arquivo.getName();
+					textoSalvo = abreArquivo(arquivo);
+					janela.setTitle(nomeArquivo + " - MUETX (Mais Um Editor de TeXto)");
+				}
+			}
+		};
 	}
 	
 	public static boolean salvaArquivo(File arquivo, String texto){
@@ -370,5 +395,30 @@ public class Principal {
 			return false;
 		}
 	}
-
+	
+	public static void salvar(JFrame janela){
+		if (arquivo == null){
+			JFileChooser janelaArquivo = new JFileChooser();
+			janelaArquivo.showSaveDialog(janela);
+			arquivo = janelaArquivo.getSelectedFile();
+		}
+		if (arquivo != null){
+			texto = areaTexto.getText();
+			textoSalvo = salvaArquivo(arquivo, texto);
+			nomeArquivo = arquivo.getName();
+			janela.setTitle(nomeArquivo + " - MUETX (Mais Um Editor de TeXto)");
+		}
+	}
+	
+	public static void salvarComo(JFrame janela){
+		JFileChooser janelaArquivo = new JFileChooser();
+		janelaArquivo.showSaveDialog(janela);
+		arquivo = janelaArquivo.getSelectedFile();
+		if (arquivo != null){
+			texto = areaTexto.getText();
+			textoSalvo = salvaArquivo(arquivo, texto);
+			nomeArquivo = arquivo.getName();
+			janela.setTitle(nomeArquivo + " - MUETX (Mais Um Editor de TeXto)");
+		}
+	}
 }
