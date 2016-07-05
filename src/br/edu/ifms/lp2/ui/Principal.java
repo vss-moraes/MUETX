@@ -104,7 +104,6 @@ public class Principal {
 		});
 		
 		areaTexto = new JTextArea();
-		
 		areaTexto.addCaretListener(new CaretListener() {
 			
 			@Override
@@ -135,22 +134,22 @@ public class Principal {
 		areaTexto.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void removeUpdate(DocumentEvent e){
+				textoSalvo = false;
 				numeroLinhas.atualizaNumeroLinhas();
 				if (nomeArquivo.charAt(0) != '*' && !textoSalvo){
 					nomeArquivo = "*" + nomeArquivo;
 					janela.setTitle(nomeArquivo + " - MUETX (Mais Um Editor de TeXto)");
 				}
-				textoSalvo = false;
 			}
 			
 			@Override
 			public void insertUpdate(DocumentEvent e) {
+				textoSalvo = false;
 				numeroLinhas.atualizaNumeroLinhas();
 				if (nomeArquivo.charAt(0) != '*' && !textoSalvo){
 					nomeArquivo = "*" + nomeArquivo;
 					janela.setTitle(nomeArquivo + " - MUETX (Mais Um Editor de TeXto)");
 				}
-				textoSalvo = false;
 			}
 			
 			@Override
