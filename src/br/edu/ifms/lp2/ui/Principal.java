@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JTextArea;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -18,9 +19,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultEditorKit;
@@ -32,6 +34,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.Scanner;
 import java.awt.event.InputEvent;
+import javax.swing.SwingConstants;
 
 public class Principal {
 
@@ -99,7 +102,26 @@ public class Principal {
 		});
 		
 		areaTexto = new JTextArea();
-		areaTexto.setTabSize(4);
+		
+		areaTexto.addCaretListener(new CaretListener() {
+			
+			@Override
+			public void caretUpdate(CaretEvent arg0) {
+				int numeroLinha = 1;
+				int numeroColuna = 1;
+				
+				try {
+					int posicaoCursor = areaTexto.getCaretPosition();
+					numeroLinha = areaTexto.getLineOfOffset(posicaoCursor);
+					numeroColuna = posicaoCursor - areaTexto.getLineOfOffset(numeroLinha);
+					numeroLinha++;
+					
+				} catch (Exception e){}
+				
+				atualizaStatus(numeroLinha, numeroColuna);
+				
+			}
+		});
 		janela.getContentPane().add(areaTexto, BorderLayout.CENTER);
 		
 		scrollPane = new JScrollPane(areaTexto);
@@ -303,6 +325,7 @@ public class Principal {
 		barraFerramentas.add(btnRecortar);
 		
 		textoBarraStatus = new JTextField();
+		textoBarraStatus.setHorizontalAlignment(SwingConstants.CENTER);
 		textoBarraStatus.setEditable(false);
 		
 		barraStatus = new JToolBar();
@@ -311,8 +334,13 @@ public class Principal {
 		barraStatus.setVisible(false);
 		janela.getContentPane().add(barraStatus, BorderLayout.SOUTH);
 		
+		atualizaStatus(1, 1);
 		barraStatus.add(textoBarraStatus);
 		
+	}
+	
+	public void atualizaStatus (int numeroLinha, int numeroColuna){
+		textoBarraStatus.setText("Linha: " + numeroLinha + " | Coluna: " + numeroColuna);
 	}
 	
 	public static boolean verificaMudanca(File arquivo, JFrame janela, boolean textoSalvo){

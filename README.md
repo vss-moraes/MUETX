@@ -9,11 +9,11 @@ Editor de texto simples criado para avaliação na disciplina Linguagens de Prog
 * Indicador visual para alterações no arquivo
 * Número de linhas
 * Barra de ferramentas básica
+* Barra de status com posição atual do cursor
 
 ### Funções a Serem Implementadas
 
 * Destaque de sintaxe
-* Barra de status
 * Opções de tamanho e tipo da fonte
 * Esquemas de cores
 
