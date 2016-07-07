@@ -32,8 +32,5 @@ public class TextAreaNumeroLinhas extends JTextArea {
 		}
 		
 		return construtorNumeroLinhas.toString();
-		
 	}
-	
-	
 }

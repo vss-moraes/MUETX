@@ -387,7 +387,7 @@ public class Principal {
 	
 	public static boolean verificaMudanca(File arquivo, JFrame janela, boolean textoSalvo){
 		if (!textoSalvo){
-			int resposta = JOptionPane.showConfirmDialog(janela, "Deseja salvar as alterações?");
+			int resposta = JOptionPane.showConfirmDialog(janela, "O arquivo foi alterado. \nDeseja salvar as alterações?");
 			if (resposta == JOptionPane.YES_OPTION){
 				if (arquivo == null){
 					JFileChooser janelaArquivo = new JFileChooser();
